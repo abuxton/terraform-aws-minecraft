@@ -29,7 +29,6 @@ data "aws_ami" "ubuntu" {
 // S3 bucket info
 data "aws_s3_bucket" "mc" {
   bucket = var.bucket_id
-  depends_on = [var.module_depends_on]
 }
 
 // IAM role for S3 access
@@ -55,6 +54,7 @@ EOF
 resource "aws_iam_instance_profile" "mc" {
   name = "minecraft_instance_profile"
   role = aws_iam_role.allow_s3.name
+  depends_on = [var.module_depends_on]
 }
 
 resource "aws_iam_role_policy" "mc_allow_ec2_to_s3" {
