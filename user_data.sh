@@ -158,7 +158,7 @@ sudo chown -R minecraft:minecraft ${mc_root}
 # Start the server
 case $OS in
   Ubuntu*)
-    /usr/bin/systemctl start minecraft
+    /bin/systemctl start minecraft
     ;;
   Amazon*)
     /usr/bin/systemctl start minecraft
