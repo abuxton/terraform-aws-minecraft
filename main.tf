@@ -25,10 +25,11 @@ data "aws_ami" "ubuntu" {
   "099720109477"]
   # Canonical
 }
-
+  
 // S3 bucket info
 data "aws_s3_bucket" "mc" {
   bucket = var.bucket_id
+  depends_on = [var.vm_depends_on]
 }
 
 // IAM role for S3 access
