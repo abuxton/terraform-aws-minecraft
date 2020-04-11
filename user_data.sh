@@ -79,7 +79,7 @@ ProtectControlGroups=true
 # It is hence recommended to turn this on for most services.
 # Implies MountAPIVFS=yes
 
-ExecStart=/bin/sh -c '/usr/bin/screen -DmS mc-%i /usr/bin/java -server -Xms512M -Xmx2048M -XX:+UseG1GC -XX:+CMSIncrementalPacing -XX:+CMSClassUnloadingEnabled -XX:ParallelGCThreads=2 -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -jar $(ls -v ${mc_root} | grep -i "FTBServer.*jar\|minecraft_server.*jar" | head -n 1) nogui'
+ExecStart=/bin/sh -c '/usr/bin/screen -DmS mc-%i /usr/bin/java -server -Xms512M -Xmx2048M -XX:+UseG1GC -XX:+CMSIncrementalPacing -XX:+CMSClassUnloadingEnabled -XX:ParallelGCThreads=2 -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -jar ${mc_root}/$(ls -v ${mc_root} | grep -i "FTBServer.*jar\|minecraft_server.*jar" | head -n 1) nogui'
 
 ExecReload=/usr/bin/screen -p 0 -S mc-%i -X eval 'stuff "reload"\\015'
 
