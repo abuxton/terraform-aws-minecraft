@@ -115,18 +115,6 @@ SYSTEM
 
 MINECRAFT_JAR="minecraft_server.${mc_version}.jar"
 
-case $OS in
-  Ubuntu*)
-    ubuntu_linux_setup
-    ;;
-  Amazon*)
-    amazon_linux_setup
-    ;;
-  *)
-    echo "$PROG: unsupported OS $OS"
-    exit 1
-esac
-
 # Create mc dir, sync S3 to it and download mc if not already there (from S3)
 /bin/mkdir -p ${mc_root}
 /usr/bin/aws s3 sync s3://${mc_bucket} ${mc_root} --region `hostname -f | cut -d'.' -f2`
@@ -146,10 +134,25 @@ CRON
 eula=true
 EULA
 
+
 # Not root
 #/bin/chown -R $SSH_USER ${mc_root}
 sudo usermod -a -G minecraft $SSH_USER
 sudo chown -R minecraft:minecraft ${mc_root}
+
+case $OS in
+  Ubuntu*)
+    ubuntu_linux_setup
+    ;;
+  Amazon*)
+    amazon_linux_setup
+    ;;
+  *)
+    echo "$PROG: unsupported OS $OS"
+    exit 1
+esac
+
+
 # Start the server
 case $OS in
   Ubuntu*)
