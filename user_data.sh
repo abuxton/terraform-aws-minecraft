@@ -41,7 +41,7 @@ ubuntu_linux_setup() {
   export SSH_USER="ubuntu"
   export DEBIAN_FRONTEND=noninteractive
   /usr/bin/apt-get update
-  /usr/bin/apt-get -yq install -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" default-jre wget awscli openjdk-8-jre-headless curl screen nano bash grep tree 
+  /usr/bin/apt-get -yq install -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" default-jre wget awscli openjdk-8-jre-headless curl screen nano bash grep tree git 
   /bin/cat <<"__UPG__" > /etc/apt/apt.conf.d/10periodic
 APT::Periodic::Update-Package-Lists "1";
 APT::Periodic::Download-Upgradeable-Packages "1";
