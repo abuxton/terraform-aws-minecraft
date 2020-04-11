@@ -81,7 +81,7 @@ variable "allowed_cidrs" {
   default     = "0.0.0.0/0"
 }
 
-variable "vm_depends_on" {
+variable "module_depends_on" {
   type    = any
   default = null
 }
