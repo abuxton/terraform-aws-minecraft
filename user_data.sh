@@ -120,6 +120,18 @@ MINECRAFT_JAR="minecraft_server.${mc_version}.jar"
 /usr/bin/aws s3 sync s3://${mc_bucket} ${mc_root} --region `hostname -f | cut -d'.' -f2`
 [[ -e "${mc_root}/$MINECRAFT_JAR" ]] || /usr/bin/wget -O ${mc_root}/$MINECRAFT_JAR https://launcher.mojang.com/v1/objects/bb2b6b1aefcd70dfd1892149ac3a215f6c636b07/server.jar
 
+case $OS in
+  Ubuntu*)
+    ubuntu_linux_setup
+    ;;
+  Amazon*)
+    amazon_linux_setup
+    ;;
+  *)
+    echo "$PROG: unsupported OS $OS"
+    exit 1
+esac
+
 # Cron job to sync data to S3 every five mins
 /bin/cat <<CRON > /etc/cron.d/minecraft
 SHELL=/bin/bash
@@ -140,17 +152,7 @@ EULA
 sudo usermod -a -G minecraft $SSH_USER
 sudo chown -R minecraft:minecraft ${mc_root}
 
-case $OS in
-  Ubuntu*)
-    ubuntu_linux_setup
-    ;;
-  Amazon*)
-    amazon_linux_setup
-    ;;
-  *)
-    echo "$PROG: unsupported OS $OS"
-    exit 1
-esac
+
 
 
 # Start the server
