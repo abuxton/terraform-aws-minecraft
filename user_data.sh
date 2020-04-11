@@ -129,14 +129,14 @@ esac
 
 # Create mc dir, sync S3 to it and download mc if not already there (from S3)
 /bin/mkdir -p ${mc_root}
-/usr/bin/aws s3 sync s3://${mc_bucket} ${mc_root}
+/usr/bin/aws s3 sync s3://${mc_bucket} ${mc_root} --region `hostname -f | cut -d'.' -f2`
 [[ -e "$MINECRAFT_JAR" ]] || /usr/bin/wget -O ${mc_root}/$MINECRAFT_JAR https://s3.amazonaws.com/Minecraft.Download/versions/${mc_version}/$MINECRAFT_JAR
 
 # Cron job to sync data to S3 every five mins
 /bin/cat <<CRON > /etc/cron.d/minecraft
 SHELL=/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:${mc_root}
-*/${mc_backup_freq} * * * *  $SSH_USER  /usr/bin/aws s3 sync ${mc_root}  s3://${mc_bucket}
+*/${mc_backup_freq} * * * *  $SSH_USER  /usr/bin/aws s3 sync ${mc_root}  s3://${mc_bucket} --region `hostname -f | cut -d'.' -f2`
 CRON
 
 # Update minecraft EULA
