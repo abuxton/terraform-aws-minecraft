@@ -29,7 +29,7 @@ data "aws_ami" "ubuntu" {
 // S3 bucket info
 data "aws_s3_bucket" "mc" {
   bucket = var.bucket_id
-  depends_on = [var.vm_depends_on]
+  depends_on = [var.module_depends_on]
 }
 
 // IAM role for S3 access
