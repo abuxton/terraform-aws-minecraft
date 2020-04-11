@@ -149,7 +149,7 @@ EULA
 # Not root
 #/bin/chown -R $SSH_USER ${mc_root}
 sudo usermod -a -G minecraft $SSH_USER
-
+sudo chown -R minecraft:minecraft ${mc_root}
 # Start the server
 case $OS in
   Ubuntu*)
