@@ -52,7 +52,7 @@ __UPG__
 adduser --system --shell /bin/bash --home /opt/minecraft --group minecraft
 
 # Init script for starting, stopping https://minecraft.gamepedia.com/Tutorials/Server_startup_script#Systemd_Script
-  cat <<INIT > /etc/systemd/system/minecraft@.service
+  cat <<SYSTEM > /etc/systemd/system/minecraft@.service
 # Source: https://github.com/agowa338/MinecraftSystemdUnit/
 # License: MIT
 [Unit]
@@ -108,41 +108,10 @@ WantedBy=multi-user.target
 # To run multiple servers simply create a new dir structure and enable/start it
 #    systemctl enable minecraft@creative
 # systemctl start minecraft@creative
-INIT
+SYSTEM
 
 }
 
-# Update OS and install start script
-amazon_linux_setup() {
-    export SSH_USER="ec2-user"
-    /usr/bin/yum install java-1.8.0 yum-cron wget awscli -y
-    /bin/sed -i -e 's/update_cmd = default/update_cmd = security/'\
-                -e 's/apply_updates = no/apply_updates = yes/'\
-                -e 's/emit_via = stdio/emit_via = email/' /etc/yum/yum-cron.conf
-    chkconfig yum-cron on
-    service yum-cron start
-    /usr/bin/yum upgrade -y
-
-    cat <<SYSTEMD > /etc/systemd/system/minecraft.service
-[Unit]
-Description=Minecraft Server
-After=network.target
-
-[Service]
-Type=simple
-User=$SSH_USER
-WorkingDirectory=${mc_root}
-ExecStart=/usr/bin/java -Xmx${java_mx_mem} -Xms${java_ms_mem} -jar $MINECRAFT_JAR nogui
-Restart=on-abort
-
-[Install]
-WantedBy=multi-user.target
-SYSTEMD
-
-  # Start on boot
-  /usr/bin/systemctl enable minecraft
-
-}
 
 MINECRAFT_JAR="minecraft_server.${mc_version}.jar"
 
