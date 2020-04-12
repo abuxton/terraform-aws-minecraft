@@ -152,10 +152,10 @@ sudo usermod -a -G minecraft $SSH_USER
 
 # Start the server
 
-mc_service = `echo ${mc_root} | awk -F/ '{print $NF}'`
+export SERVICE=`echo ${mc_root} | awk -F/ '{print $NF}'`
 case $OS in
   Ubuntu*)
-    /bin/systemctl start minecraft@${mc_service}
+    /bin/systemctl start minecraft@$SERVICE
     ;;
   Amazon*)
     /usr/bin/systemctl start minecraft
