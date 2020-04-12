@@ -49,10 +49,8 @@ APT::Periodic::AutocleanInterval "7";
 APT::Periodic::Unattended-Upgrade "1";
 __UPG__
 
-adduser --system --shell /bin/bash --home /opt/minecraft --group minecraft
-
 # Init script for starting, stopping https://minecraft.gamepedia.com/Tutorials/Server_startup_script#Systemd_Script
-  cat <<SYSTEM > /etc/systemd/system/minecraft@.service
+  cat << "__SERVICE__" > /etc/systemd/system/minecraft@.service
 # Source: https://github.com/agowa338/MinecraftSystemdUnit/
 # License: MIT
 [Unit]
@@ -108,7 +106,7 @@ WantedBy=multi-user.target
 # To run multiple servers simply create a new dir structure and enable/start it
 #    systemctl enable minecraft@creative
 # systemctl start minecraft@creative
-SYSTEM
+__SERVICE__
 
 }
 
@@ -117,6 +115,12 @@ MINECRAFT_JAR="minecraft_server.${mc_version}.jar"
 
 # Create mc dir, sync S3 to it and download mc if not already there (from S3)
 /bin/mkdir -p ${mc_root}
+adduser --system --shell /bin/bash --home /opt/minecraft --group minecraft
+sudo chown -R minecraft:minecraft ${mc_root}
+# Not root
+#/bin/chown -R $SSH_USER ${mc_root}
+sudo usermod -a -G minecraft $SSH_USER
+
 /usr/bin/aws s3 sync s3://${mc_bucket} ${mc_root} --region `hostname -f | cut -d'.' -f2`
 [[ -e "${mc_root}/$MINECRAFT_JAR" ]] || /usr/bin/wget -O ${mc_root}/$MINECRAFT_JAR https://launcher.mojang.com/v1/objects/bb2b6b1aefcd70dfd1892149ac3a215f6c636b07/server.jar
 
@@ -145,15 +149,6 @@ CRON
 #Tue Jan 27 21:40:00 UTC 2015
 eula=true
 EULA
-
-
-# Not root
-#/bin/chown -R $SSH_USER ${mc_root}
-sudo usermod -a -G minecraft $SSH_USER
-sudo chown -R minecraft:minecraft ${mc_root}
-
-
-
 
 # Start the server
 case $OS in
