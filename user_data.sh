@@ -109,21 +109,6 @@ WantedBy=multi-user.target
 __SERVICE__
 
 }
-
-
-MINECRAFT_JAR="minecraft_server.${mc_version}.jar"
-
-# Create mc dir, sync S3 to it and download mc if not already there (from S3)
-/bin/mkdir -p ${mc_root}
-adduser --system --shell /bin/bash --home /opt/minecraft --group minecraft
-sudo chown -R minecraft:minecraft ${mc_root}
-# Not root
-#/bin/chown -R $SSH_USER ${mc_root}
-sudo usermod -a -G minecraft $SSH_USER
-
-/usr/bin/aws s3 sync s3://${mc_bucket} ${mc_root} --region `hostname -f | cut -d'.' -f2`
-[[ -e "${mc_root}/$MINECRAFT_JAR" ]] || /usr/bin/wget -O ${mc_root}/$MINECRAFT_JAR https://launcher.mojang.com/v1/objects/bb2b6b1aefcd70dfd1892149ac3a215f6c636b07/server.jar
-
 case $OS in
   Ubuntu*)
     ubuntu_linux_setup
@@ -135,6 +120,15 @@ case $OS in
     echo "$PROG: unsupported OS $OS"
     exit 1
 esac
+
+
+MINECRAFT_JAR="minecraft_server.${mc_version}.jar"
+
+# Create mc dir, sync S3 to it and download mc if not already there (from S3)
+/bin/mkdir -p ${mc_root}
+
+/usr/bin/aws s3 sync s3://${mc_bucket} ${mc_root} --region `hostname -f | cut -d'.' -f2`
+[[ -e "${mc_root}/$MINECRAFT_JAR" ]] || /usr/bin/wget -O ${mc_root}/$MINECRAFT_JAR https://launcher.mojang.com/v1/objects/bb2b6b1aefcd70dfd1892149ac3a215f6c636b07/server.jar
 
 # Cron job to sync data to S3 every five mins
 /bin/cat <<CRON > /etc/cron.d/minecraft
@@ -150,10 +144,18 @@ CRON
 eula=true
 EULA
 
+adduser --system --shell /bin/bash --home /opt/minecraft --group minecraft
+sudo chown -R minecraft:minecraft ${mc_root}
+# Not root
+#/bin/chown -R $SSH_USER ${mc_root}
+sudo usermod -a -G minecraft $SSH_USER
+
 # Start the server
+
+mc_service = `echo ${mc_root} | awk -F/ '{print $NF}'`
 case $OS in
   Ubuntu*)
-    /bin/systemctl start minecraft
+    /bin/systemctl start minecraft@${mc_service}
     ;;
   Amazon*)
     /usr/bin/systemctl start minecraft
