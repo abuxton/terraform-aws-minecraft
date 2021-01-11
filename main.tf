@@ -10,19 +10,19 @@ data "aws_ami" "ubuntu" {
   most_recent = true
 
   filter {
-    name = "name"
-    values = [
-    "ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"]
+    name    = "name"
+    values  = [
+      "ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"]
   }
 
   filter {
-    name = "virtualization-type"
-    values = [
-    "hvm"]
+    name    = "virtualization-type"
+    values  = [
+      "hvm"]
   }
 
   owners = [
-  "099720109477"]
+    "099720109477"]
   # Canonical
 }
   
@@ -52,9 +52,9 @@ EOF
 }
 
 resource "aws_iam_instance_profile" "mc" {
-  name = "minecraft_instance_profile"
-  role = aws_iam_role.allow_s3.name
-  depends_on = [var.module_depends_on]
+  name        = "minecraft_instance_profile"
+  role        = aws_iam_role.allow_s3.name
+  depends_on  = [var.module_depends_on]
 }
 
 resource "aws_iam_role_policy" "mc_allow_ec2_to_s3" {
@@ -99,14 +99,13 @@ data "template_file" "user_data" {
 
 // Security group for our instance - allows SSH and minecraft 
 module "ec2_security_group" {
-  source = "git@github.com:terraform-aws-modules/terraform-aws-security-group.git?ref=master"
+  source      = "git@github.com:terraform-aws-modules/terraform-aws-security-group.git?ref=master"
 
   name        = "${var.name}-ec2"
   description = "Allow SSH and TCP ${var.mc_port}"
   vpc_id      = var.vpc_id
-
   ingress_cidr_blocks = [
-  var.allowed_cidrs]
+    var.allowed_cidrs]
   ingress_rules = [
   "ssh-tcp"]
   ingress_with_cidr_blocks = [
@@ -120,28 +119,24 @@ module "ec2_security_group" {
   ]
   egress_rules = [
   "all-all"]
-
   tags = var.tags
 }
 
 // EC2 instance for the server - tune instance_type to fit your performance and budget requirements
 module "ec2_minecraft" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git?ref=master"
-  name   = "${var.name}-public"
-
+  source                  = "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git?ref=master"
+  name                    = "${var.name}-public"
   # instance
-  key_name             = var.key_name
-  ami                  = var.ami != "" ? var.ami : data.aws_ami.ubuntu.image_id
-  instance_type        = var.instance_type
-  iam_instance_profile = aws_iam_instance_profile.mc.id
-  user_data            = data.template_file.user_data.rendered
-
+  key_name                = var.key_name
+  ami                     = var.ami != "" ? var.ami : data.aws_ami.ubuntu.image_id
+  instance_type           = var.instance_type
+  iam_instance_profile    = aws_iam_instance_profile.mc.id
+  user_data               = data.template_file.user_data.rendered
   # network
-  subnet_id = var.subnet_id
-  vpc_security_group_ids = [
+  subnet_id               = var.subnet_id
+  vpc_security_group_ids  = [
   module.ec2_security_group.this_security_group_id]
   associate_public_ip_address = var.associate_public_ip_address
-
-  tags = var.tags
+  tags                    = var.tags
 }
 
